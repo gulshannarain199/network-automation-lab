@@ -43,5 +43,28 @@ class NetworkAuditor:
             return None
 
 if __name__ == "__main__":
+    # 1. Initialize our auditor client
     auditor = NetworkAuditor("10.1.1.1", "admin", "Cisco123")
+    
+    # 2. Fetch the raw multi-interface JSON data container
     interface_data = auditor.fetch_operational_status()
+    
+    # 3. The Loop Engine: Process data if the router returned a valid response
+    if interface_data and "ietf-interfaces:interfaces-state" in interface_data:
+        # Dig into the JSON dictionary to grab the actual list array of interfaces
+        interfaces_list = interface_data["ietf-interfaces:interfaces-state"]["interface"]
+        
+        print("\n=== 🔍 STARTING OPERATIONAL INTERFACE AUDIT ===")
+        
+        # Loop through the interfaces list one by one
+        for interface in interfaces_list:
+            name = interface.get("name")
+            status = interface.get("oper-status")
+            
+            # Audit the state and filter the output
+            if status == "down":
+                print(f"🛑 Alert: Interface {name} is currently DOWN!")
+            else:
+                print(f"✅ Interface {name} is healthy (UP).")
+                
+        print("=== 🏁 AUDIT COMPLETE ===")
