@@ -1,0 +1,16 @@
+---
+- name: Run Show Commands on Cisco IOS Devices
+  hosts: cisco
+  gather_facts: no
+
+  tasks:
+    - name: Run Show Version and Show IP Interface Brief
+      cisco.ios.ios_command:
+        commands:
+          - show version
+          - show ip interface brief
+      register: command_output
+
+    - name: Print Raw Show Version Output to Terminal
+      ansible.builtin.debug:
+        msg: "{{ command_output.stdout[0] }}"
